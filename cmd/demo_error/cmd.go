@@ -3,8 +3,9 @@ package demo_error
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/cobra"
 	"runtime"
+
+	"github.com/spf13/cobra"
 )
 
 var Cmd = &cobra.Command{
@@ -12,12 +13,29 @@ var Cmd = &cobra.Command{
 	Short: "demo_error",
 	Long:  `demo_error`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//demoErrorIs()
+		// demoErrorIs()
 		//demoErrorAs()
-		//demoCallerFrame()
+		// demoCallerFrame()
 		demoCallFrameWithCustomError()
+
+		// res, err := devide(10, 2)
+
+		// if err != nil {
+		// 	fmt.Println("Error")
+		// } else {
+		// 	fmt.Println("Normal")
+		// }
 	},
 }
+
+// var DivideByZeros = errors.New("Divide by zeros")
+
+// func devide(a, b int) (int, error) {
+// 	if b == 0 {
+// 		return 0, errors.New("cannot divide by zeros")
+// 	}
+// 	return a / b, nil
+// }
 
 type StackError struct {
 	Message string
@@ -41,7 +59,7 @@ func (e *StackError) Error() string {
 
 func newStackError(msg string) error {
 	pc := make([]uintptr, 10)
-	runtime.Callers(2, pc)
+	runtime.Callers(3, pc)
 	return &StackError{Message: msg, Frames: pc}
 }
 

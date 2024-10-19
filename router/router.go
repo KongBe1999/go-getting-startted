@@ -2,9 +2,6 @@ package router
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"go-getting-started/conf"
 	"go-getting-started/controller"
 	_ "go-getting-started/docs"
@@ -12,17 +9,41 @@ import (
 	"go-getting-started/model"
 	"go-getting-started/repository"
 	"go-getting-started/service"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"time"
+
+	"github.com/getsentry/sentry-go"
+	sentrygin "github.com/getsentry/sentry-go/gin"
 )
 
 func InitRouter() (*gin.Engine, error) {
+	// err := conf.InitConfig()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(middlewares.GenRequestId())
 	r.Use(middlewares.GinZap())
+
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn:           conf.GlobalConfig.Sentry.SentryDSN,
+		EnableTracing: true,
+		// Set TracesSampleRate to 1.0 to capture 100%
+		// of transactions for tracing.
+		// We recommend adjusting this value in production,
+		TracesSampleRate: 1.0,
+	}); err != nil {
+		fmt.Printf("Sentry initialization failed: %v\n", err)
+	}
+	r.Use(sentrygin.New(sentrygin.Options{}))
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

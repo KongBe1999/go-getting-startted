@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: go-getting-started
     ports:
-      - 3306:3306
+      - 3307:3306
   api:
     build:
       context: .
